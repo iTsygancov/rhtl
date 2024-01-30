@@ -1,3 +1,4 @@
+import { TimelineContextProvider, useTimelineContext } from "@/context";
 import { cn } from "@/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
@@ -17,45 +18,6 @@ const timelineVariants = cva("flex flex-col gap-2 p-8", {
     position: "left"
   }
 });
-
-type ActiveItemContextProps = {
-  isRefsInitialized: boolean;
-  refs: {
-    icon: React.RefObject<HTMLDivElement>;
-  };
-  setIsRefInitialized: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const TimelineContext = React.createContext<ActiveItemContextProps>({
-  isRefsInitialized: false,
-  refs: {
-    icon: React.createRef<HTMLDivElement>()
-  },
-  setIsRefInitialized: () => {}
-});
-
-const TimelineContextProvider = ({
-  children
-}: {
-  children: React.ReactNode;
-}) => {
-  const [isRefsInitialized, setIsRefInitialized] = React.useState(false);
-  const iconRef = React.useRef<HTMLDivElement>(null);
-
-  return (
-    <TimelineContext.Provider
-      value={{
-        isRefsInitialized,
-        refs: {
-          icon: iconRef
-        },
-        setIsRefInitialized
-      }}
-    >
-      {children}
-    </TimelineContext.Provider>
-  );
-};
 
 export interface TimelineProps
   extends React.HTMLAttributes<HTMLDivElement>,
@@ -82,7 +44,7 @@ const TimelineItem = React.forwardRef<
     refs: { icon },
     isRefsInitialized,
     setIsRefInitialized
-  } = React.useContext(TimelineContext);
+  } = useTimelineContext();
 
   React.useEffect(() => {
     if (!isRefsInitialized && icon.current) {
@@ -106,13 +68,14 @@ const TimelineItem = React.forwardRef<
 });
 TimelineItem.displayName = "TimelineItem";
 
-const TimelineIcon = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, children, ...props }) => {
+const TimelineIcon = ({
+  className,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => {
   const {
     refs: { icon }
-  } = React.useContext(TimelineContext);
+  } = useTimelineContext();
 
   return children ? (
     <div ref={icon} {...props}>
@@ -129,7 +92,7 @@ const TimelineIcon = React.forwardRef<
       {...props}
     />
   );
-});
+};
 TimelineIcon.displayName = "TimelineIcon";
 
 const TimelineSeparator = React.forwardRef<
@@ -174,10 +137,10 @@ const TimelineHeader = React.forwardRef<
 });
 TimelineHeader.displayName = "TimelineHeader";
 
-const TimelineDate = React.forwardRef<
-  HTMLTimeElement,
-  React.HTMLAttributes<HTMLTimeElement>
->(({ className, ...props }) => {
+const TimelineDate = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLTimeElement>) => {
   return (
     <time
       className={cn(
@@ -187,7 +150,7 @@ const TimelineDate = React.forwardRef<
       {...props}
     />
   );
-});
+};
 TimelineDate.displayName = "TimelineDate";
 
 const TimelineTitle = React.forwardRef<
@@ -211,7 +174,7 @@ const TimelineContent = React.forwardRef<
 >(({ className, children, ...props }, ref) => {
   const {
     refs: { icon }
-  } = React.useContext(TimelineContext);
+  } = useTimelineContext();
 
   return (
     <div ref={ref} className={cn("flex gap-2", className)} {...props}>
