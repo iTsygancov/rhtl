@@ -8,26 +8,19 @@ import {
 
 function App() {
   return (
-    <Timeline>
-      <TimelineItem>
-        <TimelineHeader>
-          <TimelineDate>February 2022</TimelineDate>
-        </TimelineHeader>
-        <TimelineContent>
-          <h3 className='text-xl font-bold'>Title 1</h3>
-          <div>Item 1</div>
-        </TimelineContent>
-      </TimelineItem>
-      <TimelineItem>
-        <TimelineHeader>
-          <TimelineDate>March 2022</TimelineDate>
-        </TimelineHeader>
-        <TimelineContent>
-          <h3 className='text-xl font-bold'>Title 2</h3>
-          <div>Item 2</div>
-        </TimelineContent>
-      </TimelineItem>
-    </Timeline>
+    <>
+      <Timeline>
+        <TimelineItem>
+          <TimelineHeader>
+            <TimelineDate>February 2022</TimelineDate>
+          </TimelineHeader>
+          <TimelineContent>
+            <h3 className='text-xl font-bold'>Title 1</h3>
+            <div>Item 1</div>
+          </TimelineContent>
+        </TimelineItem>
+      </Timeline>
+    </>
   );
 }
 

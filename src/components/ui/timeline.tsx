@@ -25,7 +25,7 @@ export interface TimelineProps
 
 const Timeline = React.forwardRef<HTMLDivElement, TimelineProps>(
   ({ className, position, ...props }, ref) => (
-    <TimelineContextProvider>
+    <TimelineContextProvider initialPosition={position}>
       <div
         ref={ref}
         className={cn(timelineVariants({ position, className }))}
@@ -43,7 +43,8 @@ const TimelineItem = React.forwardRef<
   const {
     refs: { icon },
     isRefsInitialized,
-    setIsRefInitialized
+    setIsRefInitialized,
+    position
   } = useTimelineContext();
 
   React.useEffect(() => {
@@ -57,6 +58,7 @@ const TimelineItem = React.forwardRef<
       className={cn(
         "relative flex min-h-16 flex-col gap-2",
         !isRefsInitialized && "opacity-0",
+        position === "right" && "items-end",
         className
       )}
       ref={ref}
@@ -113,6 +115,7 @@ const TimelineHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, children, ...props }, ref) => {
+  const { position } = useTimelineContext();
   const iconChild = React.Children.toArray(children).find((child) => {
     if (React.isValidElement(child) && child.type === TimelineIcon) {
       return child.props.children;
@@ -130,8 +133,9 @@ const TimelineHeader = React.forwardRef<
       className={cn("flex items-center gap-2", className)}
       {...props}
     >
-      {iconChild || <TimelineIcon />}
+      {position === "left" && (iconChild || <TimelineIcon />)}
       {filteredChild}
+      {position === "right" && (iconChild || <TimelineIcon />)}
     </div>
   );
 });
@@ -173,17 +177,27 @@ const TimelineContent = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, children, ...props }, ref) => {
   const {
-    refs: { icon }
+    refs: { icon },
+    position
   } = useTimelineContext();
 
   return (
     <div ref={ref} className={cn("flex gap-2", className)} {...props}>
-      <TimelineSeparator
-        style={{
-          width: icon.current?.offsetWidth
-        }}
-      />
+      {position === "left" && (
+        <TimelineSeparator
+          style={{
+            width: icon.current?.offsetWidth
+          }}
+        />
+      )}
       <div className='pb-2'>{children}</div>
+      {position === "right" && (
+        <TimelineSeparator
+          style={{
+            width: icon.current?.offsetWidth
+          }}
+        />
+      )}
     </div>
   );
 });
