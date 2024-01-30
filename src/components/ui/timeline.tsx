@@ -15,7 +15,7 @@ const timelineVariants = cva("flex flex-col gap-2 p-8", {
     }
   },
   defaultVariants: {
-    position: "default-reverse"
+    position: "default"
   }
 });
 
@@ -118,7 +118,15 @@ const TimelineHeader = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, children, ...props }, ref) => {
   const { position } = useTimelineContext();
-  const timeRef = React.useRef<HTMLTimeElement>(null);
+  const [width, setWidth] = React.useState(0);
+  const timeRef = React.useRef<HTMLTimeElement | null>(null);
+
+  React.useEffect(() => {
+    if (timeRef.current) {
+      setWidth(Math.floor(timeRef.current.offsetWidth));
+    }
+  }, []);
+
   const iconChild = React.Children.toArray(children).find((child) => {
     if (React.isValidElement(child) && child.type === TimelineIcon) {
       return child.props.children;
@@ -139,7 +147,7 @@ const TimelineHeader = React.forwardRef<
       {position === "default" && (
         <div
           style={{
-            width: timeRef.current?.offsetWidth
+            width: width
           }}
         ></div>
       )}
@@ -151,7 +159,7 @@ const TimelineHeader = React.forwardRef<
       {position === "default-reverse" && (
         <div
           style={{
-            width: timeRef.current?.offsetWidth
+            width: width
           }}
         ></div>
       )}
@@ -200,15 +208,21 @@ const TimelineContent = React.forwardRef<
     refs: { icon },
     position
   } = useTimelineContext();
+  const contentRef = React.useRef<HTMLDivElement | null>(null);
+  const [width, setWidth] = React.useState(0);
 
-  const contentRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    if (contentRef.current) {
+      setWidth(Math.floor(contentRef.current.offsetWidth));
+    }
+  }, []);
 
   return (
     <div ref={ref} className={cn("flex gap-2", className)} {...props}>
       {position === "default" && (
         <div
           style={{
-            width: contentRef.current?.offsetWidth
+            width: width
           }}
         ></div>
       )}
@@ -232,7 +246,7 @@ const TimelineContent = React.forwardRef<
       {position === "default-reverse" && (
         <div
           style={{
-            width: contentRef.current?.offsetWidth
+            width: width
           }}
         ></div>
       )}
