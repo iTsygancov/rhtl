@@ -15,7 +15,7 @@ const timelineVariants = cva("flex flex-col gap-2 p-8", {
     }
   },
   defaultVariants: {
-    position: "left"
+    position: "default"
   }
 });
 
@@ -59,6 +59,7 @@ const TimelineItem = React.forwardRef<
         "relative flex min-h-16 flex-col gap-2",
         !isRefsInitialized && "opacity-0",
         position === "right" && "items-end",
+        position === "default" && "items-center",
         className
       )}
       ref={ref}
@@ -116,6 +117,7 @@ const TimelineHeader = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, children, ...props }, ref) => {
   const { position } = useTimelineContext();
+  const timeRef = React.useRef<HTMLTimeElement>(null);
   const iconChild = React.Children.toArray(children).find((child) => {
     if (React.isValidElement(child) && child.type === TimelineIcon) {
       return child.props.children;
@@ -133,28 +135,37 @@ const TimelineHeader = React.forwardRef<
       className={cn("flex items-center gap-2", className)}
       {...props}
     >
-      {position === "left" && (iconChild || <TimelineIcon />)}
-      {filteredChild}
+      {position === "default" && (
+        <div
+          style={{
+            width: timeRef.current?.offsetWidth
+          }}
+        ></div>
+      )}
+      {(position === "left" || position === "default") &&
+        (iconChild || <TimelineIcon />)}
+      <TimelineDate ref={timeRef}>{filteredChild}</TimelineDate>
       {position === "right" && (iconChild || <TimelineIcon />)}
     </div>
   );
 });
 TimelineHeader.displayName = "TimelineHeader";
 
-const TimelineDate = ({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLTimeElement>) => {
+const TimelineDate = React.forwardRef<
+  HTMLTimeElement,
+  React.HTMLAttributes<HTMLTimeElement>
+>(({ className, ...props }, ref) => {
   return (
     <time
       className={cn(
         "text-sm font-normal leading-none text-gray-400 dark:text-gray-500",
         className
       )}
+      ref={ref}
       {...props}
     />
   );
-};
+});
 TimelineDate.displayName = "TimelineDate";
 
 const TimelineTitle = React.forwardRef<
@@ -181,16 +192,27 @@ const TimelineContent = React.forwardRef<
     position
   } = useTimelineContext();
 
+  const contentRef = React.useRef<HTMLDivElement>(null);
+
   return (
     <div ref={ref} className={cn("flex gap-2", className)} {...props}>
-      {position === "left" && (
+      {position === "default" && (
+        <div
+          style={{
+            width: contentRef.current?.offsetWidth
+          }}
+        ></div>
+      )}
+      {(position === "left" || position === "default") && (
         <TimelineSeparator
           style={{
             width: icon.current?.offsetWidth
           }}
         />
       )}
-      <div className='pb-2'>{children}</div>
+      <div className='pb-2' ref={contentRef}>
+        {children}
+      </div>
       {position === "right" && (
         <TimelineSeparator
           style={{
