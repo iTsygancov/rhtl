@@ -9,13 +9,13 @@ const timelineVariants = cva("flex flex-col gap-2 p-8", {
       alternate: "",
       "alternate-reverse": "",
       default: "",
-      "default-reverse": "",
+      "default-reverse": "text-right",
       left: "",
       right: "text-right"
     }
   },
   defaultVariants: {
-    position: "default"
+    position: "default-reverse"
   }
 });
 
@@ -59,7 +59,8 @@ const TimelineItem = React.forwardRef<
         "relative flex min-h-16 flex-col gap-2",
         !isRefsInitialized && "opacity-0",
         position === "right" && "items-end",
-        position === "default" && "items-center",
+        (position === "default" || position === "default-reverse") &&
+          "items-center",
         className
       )}
       ref={ref}
@@ -145,7 +146,15 @@ const TimelineHeader = React.forwardRef<
       {(position === "left" || position === "default") &&
         (iconChild || <TimelineIcon />)}
       <TimelineDate ref={timeRef}>{filteredChild}</TimelineDate>
-      {position === "right" && (iconChild || <TimelineIcon />)}
+      {(position === "right" || position === "default-reverse") &&
+        (iconChild || <TimelineIcon />)}
+      {position === "default-reverse" && (
+        <div
+          style={{
+            width: timeRef.current?.offsetWidth
+          }}
+        ></div>
+      )}
     </div>
   );
 });
@@ -213,12 +222,19 @@ const TimelineContent = React.forwardRef<
       <div className='pb-2' ref={contentRef}>
         {children}
       </div>
-      {position === "right" && (
+      {(position === "right" || position === "default-reverse") && (
         <TimelineSeparator
           style={{
             width: icon.current?.offsetWidth
           }}
         />
+      )}
+      {position === "default-reverse" && (
+        <div
+          style={{
+            width: contentRef.current?.offsetWidth
+          }}
+        ></div>
       )}
     </div>
   );

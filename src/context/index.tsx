@@ -22,7 +22,7 @@ type TimelineContextProviderProps = {
 
 export function TimelineContextProvider({
   children,
-  initialPosition = "default"
+  initialPosition = "default-reverse"
 }: TimelineContextProviderProps) {
   const [isRefsInitialized, setIsRefInitialized] = useState(false);
   const [position, setPosition] = useState<Position>(initialPosition);
