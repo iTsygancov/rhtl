@@ -151,16 +151,9 @@ export interface TimelineHeaderProps
 const TimelineHeader = React.forwardRef<HTMLDivElement, TimelineHeaderProps>(
   ({ className, children, orderindex, ...props }, ref) => {
     const { position } = useTimelineContext();
-    const [width, setWidth] = React.useState(0);
     const timeRef = React.useRef<HTMLHeadingElement | null>(null);
     const isEvenIndex = orderindex && orderindex % 2 === 0;
     const isOddIndex = orderindex && orderindex % 2 !== 0;
-
-    React.useEffect(() => {
-      if (timeRef.current) {
-        setWidth(Math.floor(timeRef.current.offsetWidth));
-      }
-    }, []);
 
     const iconChild = React.Children.toArray(children).find((child) => {
       if (React.isValidElement(child) && child.type === TimelineIcon) {
@@ -176,17 +169,16 @@ const TimelineHeader = React.forwardRef<HTMLDivElement, TimelineHeaderProps>(
     return (
       <div
         ref={ref}
-        className={cn("flex items-center gap-2", className)}
+        className={cn(
+          "flex w-full items-center justify-center gap-2",
+          className
+        )}
         {...props}
       >
         {(position === "default" ||
           (position === "alternate" && isOddIndex) ||
           (position === "alternate-reverse" && isEvenIndex)) && (
-          <div
-            style={{
-              width: width
-            }}
-          ></div>
+          <div className='flex-1'></div>
         )}
         {(position === "left" ||
           position === "default" ||
@@ -194,14 +186,17 @@ const TimelineHeader = React.forwardRef<HTMLDivElement, TimelineHeaderProps>(
           (position === "alternate-reverse" && isEvenIndex)) &&
           (iconChild || <TimelineIcon />)}
         {React.Children.toArray(filteredChild).map((child, index) => {
-          if (React.isValidElement(child) && child.type === TimelineTitle) {
-            return React.cloneElement(child, {
+          return (
+            React.isValidElement(child) &&
+            React.cloneElement(child, {
               ref: timeRef,
+              className: cn(
+                position === "alternate" && isEvenIndex && "text-right",
+                position === "alternate-reverse" && isOddIndex && "text-right"
+              ),
               key: index
-            } as React.HTMLAttributes<HTMLElement>);
-          } else {
-            return child;
-          }
+            } as React.HTMLAttributes<HTMLElement>)
+          );
         })}
         {(position === "right" ||
           position === "default-reverse" ||
@@ -211,11 +206,7 @@ const TimelineHeader = React.forwardRef<HTMLDivElement, TimelineHeaderProps>(
         {(position === "default-reverse" ||
           (position === "alternate" && isEvenIndex) ||
           (position === "alternate-reverse" && isOddIndex)) && (
-          <div
-            style={{
-              width: width
-            }}
-          ></div>
+          <div className='flex-1'></div>
         )}
       </div>
     );
@@ -230,7 +221,7 @@ const TimelineTitle = React.forwardRef<
   return (
     <h3
       className={cn(
-        "text-sm font-normal leading-none text-gray-400 dark:text-gray-500",
+        "flex-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500",
         className
       )}
       ref={ref}
