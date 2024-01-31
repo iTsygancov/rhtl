@@ -8,8 +8,8 @@ import {
 
 function App() {
   return (
-    <>
-      <Timeline position='alternate'>
+    <div className='container mx-auto'>
+      <Timeline position='alternate-reverse'>
         <TimelineItem>
           <TimelineHeader>
             <TimelineTitle>February 2022</TimelineTitle>
@@ -25,7 +25,16 @@ function App() {
           </TimelineHeader>
           <TimelineContent>
             <h3 className='text-xl font-bold'>Title 2</h3>
-            <div>Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2</div>
+            <div>
+              Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item
+              2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item
+              2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item
+              2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item
+              2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item
+              2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item
+              2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item 2Item
+              2Item 2Item 2Item 2
+            </div>
           </TimelineContent>
         </TimelineItem>
         <TimelineItem>
@@ -38,7 +47,7 @@ function App() {
           </TimelineContent>
         </TimelineItem>
       </Timeline>
-    </>
+    </div>
   );
 }
 

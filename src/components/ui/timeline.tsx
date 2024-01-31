@@ -252,27 +252,19 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
       refs: { icon },
       position
     } = useTimelineContext();
-    const contentRef = React.useRef<HTMLDivElement | null>(null);
-    const [width, setWidth] = React.useState(0);
     const isOddIndex = orderindex && orderindex % 2 === 1;
     const isEvenIndex = orderindex && orderindex % 2 === 0;
 
-    React.useEffect(() => {
-      if (contentRef.current) {
-        setWidth(Math.floor(contentRef.current.offsetWidth));
-      }
-    }, []);
-
     return (
-      <div ref={ref} className={cn("flex gap-2", className)} {...props}>
+      <div
+        ref={ref}
+        className={cn("flex w-full justify-center gap-2", className)}
+        {...props}
+      >
         {(position === "default" ||
           (position === "alternate" && isOddIndex) ||
           (position === "alternate-reverse" && isEvenIndex)) && (
-          <div
-            style={{
-              width: width
-            }}
-          ></div>
+          <div className='flex-1'></div>
         )}
         {(position === "left" ||
           position === "default" ||
@@ -286,11 +278,10 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
         )}
         <div
           className={cn(
-            "pb-2",
+            "flex-1 pb-2",
             position === "alternate" && isEvenIndex && "text-right",
             position === "alternate-reverse" && isOddIndex && "text-right"
           )}
-          ref={contentRef}
         >
           {children}
         </div>
@@ -307,11 +298,7 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
         {(position === "default-reverse" ||
           (position === "alternate" && isEvenIndex) ||
           (position === "alternate-reverse" && isOddIndex)) && (
-          <div
-            style={{
-              width: width
-            }}
-          ></div>
+          <div className='flex-1'></div>
         )}
       </div>
     );
