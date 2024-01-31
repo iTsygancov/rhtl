@@ -9,7 +9,7 @@ import {
 function App() {
   return (
     <>
-      <Timeline position='alternate'>
+      <Timeline position='right'>
         <TimelineItem>
           <TimelineHeader>
             <TimelineTitle>February 2022</TimelineTitle>

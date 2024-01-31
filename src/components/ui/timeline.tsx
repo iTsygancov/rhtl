@@ -80,7 +80,8 @@ const TimelineItem = React.forwardRef<HTMLDivElement, TimelineItemProps>(
           position === "right" && "items-end",
           (position === "default" ||
             position === "default-reverse" ||
-            position === "alternate") &&
+            position === "alternate" ||
+            position === "alternate-reverse") &&
             "items-center",
           className
         )}
@@ -179,7 +180,8 @@ const TimelineHeader = React.forwardRef<HTMLDivElement, TimelineHeaderProps>(
         {...props}
       >
         {(position === "default" ||
-          (position === "alternate" && isEvenIndex)) && (
+          (position === "alternate" && isEvenIndex) ||
+          (position === "alternate-reverse" && isOddIndex)) && (
           <div
             style={{
               width: width
@@ -188,7 +190,8 @@ const TimelineHeader = React.forwardRef<HTMLDivElement, TimelineHeaderProps>(
         )}
         {(position === "left" ||
           position === "default" ||
-          (position === "alternate" && isEvenIndex)) &&
+          (position === "alternate" && isEvenIndex) ||
+          (position === "alternate-reverse" && isOddIndex)) &&
           (iconChild || <TimelineIcon />)}
         {React.Children.toArray(filteredChild).map((child, index) => {
           if (React.isValidElement(child) && child.type === TimelineTitle) {
@@ -202,10 +205,12 @@ const TimelineHeader = React.forwardRef<HTMLDivElement, TimelineHeaderProps>(
         })}
         {(position === "right" ||
           position === "default-reverse" ||
-          (position === "alternate" && isOddIndex)) &&
+          (position === "alternate" && isOddIndex) ||
+          (position === "alternate-reverse" && isEvenIndex)) &&
           (iconChild || <TimelineIcon />)}
         {(position === "default-reverse" ||
-          (position === "alternate" && isOddIndex)) && (
+          (position === "alternate" && isOddIndex) ||
+          (position === "alternate-reverse" && isEvenIndex)) && (
           <div
             style={{
               width: width
@@ -261,7 +266,8 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
     return (
       <div ref={ref} className={cn("flex gap-2", className)} {...props}>
         {(position === "default" ||
-          (position === "alternate" && isEvenIndex)) && (
+          (position === "alternate" && isEvenIndex) ||
+          (position === "alternate-reverse" && isOddIndex)) && (
           <div
             style={{
               width: width
@@ -270,7 +276,8 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
         )}
         {(position === "left" ||
           position === "default" ||
-          (position === "alternate" && isEvenIndex)) && (
+          (position === "alternate" && isEvenIndex) ||
+          (position === "alternate-reverse" && isOddIndex)) && (
           <TimelineSeparator
             style={{
               width: icon.current?.offsetWidth
@@ -280,7 +287,8 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
         <div
           className={cn(
             "pb-2",
-            position === "alternate" && isOddIndex && "text-right"
+            position === "alternate" && isOddIndex && "text-right",
+            position === "alternate-reverse" && isEvenIndex && "text-right"
           )}
           ref={contentRef}
         >
@@ -288,7 +296,8 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
         </div>
         {(position === "right" ||
           position === "default-reverse" ||
-          (position === "alternate" && isOddIndex)) && (
+          (position === "alternate" && isOddIndex) ||
+          (position === "alternate-reverse" && isEvenIndex)) && (
           <TimelineSeparator
             style={{
               width: icon.current?.offsetWidth
@@ -296,7 +305,8 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
           />
         )}
         {(position === "default-reverse" ||
-          (position === "alternate" && isOddIndex)) && (
+          (position === "alternate" && isOddIndex) ||
+          (position === "alternate-reverse" && isEvenIndex)) && (
           <div
             style={{
               width: width
