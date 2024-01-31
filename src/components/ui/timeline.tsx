@@ -92,7 +92,7 @@ const TimelineIcon = ({
         width: icon.current?.offsetWidth,
         height: icon.current?.offsetHeight
       }}
-      className={cn("size-3 rounded-full bg-gray-700", className)}
+      className={cn("size-3 rounded-full bg-slate-900", className)}
       {...props}
     />
   );
@@ -106,7 +106,7 @@ const TimelineSeparator = React.forwardRef<
   return (
     children || (
       <div ref={ref} className={cn("flex gap-2", className)} {...props}>
-        <div className='mx-auto w-0.5 bg-gray-300'></div>
+        <div className='mx-auto w-0.5 bg-slate-200'></div>
       </div>
     )
   );
@@ -119,7 +119,7 @@ const TimelineHeader = React.forwardRef<
 >(({ className, children, ...props }, ref) => {
   const { position } = useTimelineContext();
   const [width, setWidth] = React.useState(0);
-  const timeRef = React.useRef<HTMLTimeElement | null>(null);
+  const timeRef = React.useRef<HTMLHeadingElement | null>(null);
 
   React.useEffect(() => {
     if (timeRef.current) {
@@ -134,6 +134,7 @@ const TimelineHeader = React.forwardRef<
   });
   const filteredChild = React.Children.toArray(children).filter((child) => {
     if (React.isValidElement(child) && child.type !== TimelineIcon) {
+      console.log(child.props.children);
       return child.props.children;
     }
   });
@@ -153,7 +154,16 @@ const TimelineHeader = React.forwardRef<
       )}
       {(position === "left" || position === "default") &&
         (iconChild || <TimelineIcon />)}
-      <TimelineDate ref={timeRef}>{filteredChild}</TimelineDate>
+      {React.Children.toArray(filteredChild).map((child, index) => {
+        if (React.isValidElement(child) && child.type === TimelineTitle) {
+          return React.cloneElement(child, {
+            ref: timeRef,
+            key: index
+          } as React.HTMLAttributes<HTMLElement>);
+        } else {
+          return child;
+        }
+      })}
       {(position === "right" || position === "default-reverse") &&
         (iconChild || <TimelineIcon />)}
       {position === "default-reverse" && (
@@ -168,12 +178,12 @@ const TimelineHeader = React.forwardRef<
 });
 TimelineHeader.displayName = "TimelineHeader";
 
-const TimelineDate = React.forwardRef<
-  HTMLTimeElement,
-  React.HTMLAttributes<HTMLTimeElement>
+const TimelineTitle = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => {
   return (
-    <time
+    <h3
       className={cn(
         "text-sm font-normal leading-none text-gray-400 dark:text-gray-500",
         className
@@ -183,22 +193,7 @@ const TimelineDate = React.forwardRef<
     />
   );
 });
-TimelineDate.displayName = "TimelineDate";
-
-const TimelineTitle = React.forwardRef<
-  HTMLHeadingElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
-  <h3
-    ref={ref}
-    className={cn(
-      "text-lg font-semibold text-gray-900 dark:text-white",
-      className
-    )}
-    {...props}
-  />
-));
-TimelineTitle.displayName = "TimelineTitle";
+TimelineTitle.displayName = "TimelineDate";
 
 const TimelineContent = React.forwardRef<
   HTMLDivElement,
@@ -260,7 +255,6 @@ export {
   TimelineItem,
   TimelineIcon,
   TimelineHeader,
-  TimelineDate,
   TimelineTitle,
   TimelineContent,
   TimelineSeparator

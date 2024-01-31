@@ -1,7 +1,7 @@
 import {
   Timeline,
   TimelineContent,
-  TimelineDate,
+  TimelineTitle,
   TimelineHeader,
   TimelineItem
 } from "@/components/ui/timeline";
@@ -9,10 +9,10 @@ import {
 function App() {
   return (
     <>
-      <Timeline position={"default-reverse"}>
+      <Timeline position='default'>
         <TimelineItem>
           <TimelineHeader>
-            <TimelineDate>February 2022</TimelineDate>
+            <TimelineTitle>February 2022</TimelineTitle>
           </TimelineHeader>
           <TimelineContent>
             <h3 className='text-xl font-bold'>Title 1</h3>
@@ -21,7 +21,7 @@ function App() {
         </TimelineItem>
         <TimelineItem>
           <TimelineHeader>
-            <TimelineDate>March 2022</TimelineDate>
+            <TimelineTitle>March 2022</TimelineTitle>
           </TimelineHeader>
           <TimelineContent>
             <h3 className='text-xl font-bold'>Title 2</h3>
