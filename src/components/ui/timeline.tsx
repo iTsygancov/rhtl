@@ -52,18 +52,14 @@ export interface TimelineItemProps
 
 const TimelineItem = React.forwardRef<HTMLDivElement, TimelineItemProps>(
   ({ className, orderIndex, children, ...props }, ref) => {
-    const {
-      refs: { icon },
-      isRefsInitialized,
-      setIsRefInitialized,
-      position
-    } = useTimelineContext();
+    const { iconRef, isRefsInitialized, setIsRefInitialized, position } =
+      useTimelineContext();
 
     React.useEffect(() => {
-      if (!isRefsInitialized && icon.current) {
+      if (!isRefsInitialized && iconRef.current) {
         setIsRefInitialized(true);
       }
-    }, [setIsRefInitialized, isRefsInitialized, icon]);
+    }, [setIsRefInitialized, isRefsInitialized, iconRef]);
 
     return (
       <div
@@ -94,26 +90,23 @@ const TimelineItem = React.forwardRef<HTMLDivElement, TimelineItemProps>(
 );
 TimelineItem.displayName = "TimelineItem";
 
-const TimelineIcon = ({
-  className,
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => {
-  const {
-    refs: { icon }
-  } = useTimelineContext();
+const TimelineIcon = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, children, ...props }, ref) => {
+  const { iconRef } = useTimelineContext();
 
   return children ? (
-    <div ref={icon} {...props}>
+    <div ref={ref} {...props}>
       {children}
     </div>
   ) : (
     <div
       className='flex items-center justify-center'
-      ref={icon}
+      ref={ref}
       style={{
-        width: icon.current?.offsetWidth,
-        height: icon.current?.offsetHeight
+        width: iconRef.current?.offsetWidth,
+        height: iconRef.current?.offsetHeight
       }}
     >
       <div
@@ -122,7 +115,7 @@ const TimelineIcon = ({
       />
     </div>
   );
-};
+});
 TimelineIcon.displayName = "TimelineIcon";
 
 const TimelineSeparator = React.forwardRef<
@@ -147,21 +140,35 @@ export interface TimelineHeaderProps
 
 const TimelineHeader = React.forwardRef<HTMLDivElement, TimelineHeaderProps>(
   ({ className, children, orderindex, ...props }, ref) => {
-    const { position } = useTimelineContext();
-    const timeRef = React.useRef<HTMLHeadingElement | null>(null);
+    const { position, iconRef } = useTimelineContext();
     const isEvenIndex = orderindex && orderindex % 2 === 0;
     const isOddIndex = orderindex && orderindex % 2 !== 0;
 
-    const iconChild = React.Children.toArray(children).find((child) => {
-      if (React.isValidElement(child) && child.type === TimelineIcon) {
-        return child.props.children;
-      }
-    });
+    const iconChild = React.Children.toArray(children).find(
+      (child) => React.isValidElement(child) && child.type === TimelineIcon
+    ) as
+      | React.ReactElement<
+          unknown,
+          string | React.JSXElementConstructor<unknown>
+        >
+      | undefined;
+
     const filteredChild = React.Children.toArray(children).filter((child) => {
       if (React.isValidElement(child) && child.type !== TimelineIcon) {
         return child.props.children;
       }
     });
+
+    const renderIcon = () => {
+      return (
+        (iconChild &&
+          React.cloneElement(iconChild, {
+            ref: iconRef
+          } as unknown as React.HTMLAttributes<HTMLDivElement>)) || (
+          <TimelineIcon />
+        )
+      );
+    };
 
     return (
       <div
@@ -181,12 +188,11 @@ const TimelineHeader = React.forwardRef<HTMLDivElement, TimelineHeaderProps>(
           position === "default" ||
           (position === "alternate" && isOddIndex) ||
           (position === "alternate-reverse" && isEvenIndex)) &&
-          (iconChild || <TimelineIcon />)}
+          renderIcon()}
         {React.Children.toArray(filteredChild).map((child, index) => {
           return (
             React.isValidElement(child) &&
             React.cloneElement(child, {
-              ref: timeRef,
               className: cn(
                 position === "alternate" && isEvenIndex && "text-right",
                 position === "alternate-reverse" && isOddIndex && "text-right"
@@ -199,7 +205,7 @@ const TimelineHeader = React.forwardRef<HTMLDivElement, TimelineHeaderProps>(
           position === "default-reverse" ||
           (position === "alternate" && isEvenIndex) ||
           (position === "alternate-reverse" && isOddIndex)) &&
-          (iconChild || <TimelineIcon />)}
+          renderIcon()}
         {(position === "default-reverse" ||
           (position === "alternate" && isEvenIndex) ||
           (position === "alternate-reverse" && isOddIndex)) && (
@@ -236,22 +242,9 @@ export interface TimelineContentProps
 
 const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
   ({ className, children, orderindex, ...props }, ref) => {
-    const {
-      refs: { icon },
-      position
-    } = useTimelineContext();
+    const { iconRef, position } = useTimelineContext();
     const isOddIndex = orderindex && orderindex % 2 === 1;
     const isEvenIndex = orderindex && orderindex % 2 === 0;
-
-    // const separatorChild = React.Children.toArray(children).map((child) => {
-    //   if (React.isValidElement(child) && child.type === TimelineSeparator) {
-    //     return React.cloneElement(child, {
-    //       style: {
-    //         width: icon.current?.offsetWidth
-    //       }
-    //     } as unknown as React.HTMLAttributes<HTMLDivElement>);
-    //   }
-    // });
 
     const separatorChild = React.Children.toArray(children).find(
       (child) => React.isValidElement(child) && child.type === TimelineSeparator
@@ -261,6 +254,23 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
           string | React.JSXElementConstructor<unknown>
         >
       | undefined;
+
+    const renderSeparator = () => {
+      return (
+        (separatorChild &&
+          React.cloneElement(separatorChild, {
+            style: {
+              width: iconRef.current?.offsetWidth
+            }
+          } as unknown as React.HTMLAttributes<HTMLDivElement>)) || (
+          <TimelineSeparator
+            style={{
+              width: iconRef.current?.offsetWidth
+            }}
+          />
+        )
+      );
+    };
 
     return (
       <div
@@ -277,18 +287,7 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
           position === "default" ||
           (position === "alternate" && isOddIndex) ||
           (position === "alternate-reverse" && isEvenIndex)) &&
-          ((separatorChild &&
-            React.cloneElement(separatorChild, {
-              style: {
-                width: icon.current?.offsetWidth
-              }
-            } as unknown as React.HTMLAttributes<HTMLDivElement>)) || (
-            <TimelineSeparator
-              style={{
-                width: icon.current?.offsetWidth
-              }}
-            />
-          ))}
+          renderSeparator()}
         <div
           className={cn(
             "flex-1 pb-2",
@@ -302,18 +301,7 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
           position === "default-reverse" ||
           (position === "alternate" && isEvenIndex) ||
           (position === "alternate-reverse" && isOddIndex)) &&
-          ((separatorChild &&
-            React.cloneElement(separatorChild, {
-              style: {
-                width: icon.current?.offsetWidth
-              }
-            } as unknown as React.HTMLAttributes<HTMLDivElement>)) || (
-            <TimelineSeparator
-              style={{
-                width: icon.current?.offsetWidth
-              }}
-            />
-          ))}
+          renderSeparator()}
         {(position === "default-reverse" ||
           (position === "alternate" && isEvenIndex) ||
           (position === "alternate-reverse" && isOddIndex)) && (

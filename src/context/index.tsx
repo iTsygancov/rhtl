@@ -10,9 +10,7 @@ import {
 
 type TimelineContextProps = {
   isRefsInitialized: boolean;
-  refs: {
-    icon: React.RefObject<HTMLDivElement>;
-  };
+  iconRef: React.RefObject<HTMLDivElement>;
   setIsRefInitialized: React.Dispatch<React.SetStateAction<boolean>>;
   position: Position;
   setPosition: React.Dispatch<React.SetStateAction<Position>>;
@@ -37,8 +35,6 @@ export function TimelineContextProvider({
   );
   const iconRef = useRef<HTMLDivElement | null>(null);
 
-  console.log();
-
   useEffect(() => {
     if (initialPosition) {
       setPosition(initialPosition);
@@ -52,9 +48,7 @@ export function TimelineContextProvider({
       value={{
         isRefsInitialized,
         setIsRefInitialized,
-        refs: {
-          icon: iconRef
-        },
+        iconRef,
         position,
         setPosition
       }}
