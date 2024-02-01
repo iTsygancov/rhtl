@@ -10,7 +10,7 @@ import {
 function App() {
   return (
     <div className='container mx-auto'>
-      <Timeline>
+      <Timeline position='left'>
         <TimelineItem>
           <TimelineHeader>
             <TimelineIcon>

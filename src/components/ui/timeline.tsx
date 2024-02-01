@@ -105,8 +105,7 @@ const TimelineIcon = React.forwardRef<
       className='flex items-center justify-center'
       ref={ref}
       style={{
-        width: iconRef.current?.offsetWidth,
-        height: iconRef.current?.offsetHeight
+        width: iconRef.current?.offsetWidth
       }}
     >
       <div
