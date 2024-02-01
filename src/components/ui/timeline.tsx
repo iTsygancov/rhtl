@@ -131,8 +131,8 @@ const TimelineSeparator = React.forwardRef<
 >(({ className, children, ...props }, ref) => {
   return (
     children || (
-      <div ref={ref} className={cn("flex gap-2", className)} {...props}>
-        <div className='mx-auto w-0.5 bg-slate-200'></div>
+      <div ref={ref} className='flex gap-2' {...props}>
+        <div className={cn("mx-auto w-0.5 bg-slate-200", className)}></div>
       </div>
     )
   );
@@ -243,6 +243,25 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
     const isOddIndex = orderindex && orderindex % 2 === 1;
     const isEvenIndex = orderindex && orderindex % 2 === 0;
 
+    // const separatorChild = React.Children.toArray(children).map((child) => {
+    //   if (React.isValidElement(child) && child.type === TimelineSeparator) {
+    //     return React.cloneElement(child, {
+    //       style: {
+    //         width: icon.current?.offsetWidth
+    //       }
+    //     } as unknown as React.HTMLAttributes<HTMLDivElement>);
+    //   }
+    // });
+
+    const separatorChild = React.Children.toArray(children).find(
+      (child) => React.isValidElement(child) && child.type === TimelineSeparator
+    ) as
+      | React.ReactElement<
+          unknown,
+          string | React.JSXElementConstructor<unknown>
+        >
+      | undefined;
+
     return (
       <div
         ref={ref}
@@ -257,13 +276,19 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
         {(position === "left" ||
           position === "default" ||
           (position === "alternate" && isOddIndex) ||
-          (position === "alternate-reverse" && isEvenIndex)) && (
-          <TimelineSeparator
-            style={{
-              width: icon.current?.offsetWidth
-            }}
-          />
-        )}
+          (position === "alternate-reverse" && isEvenIndex)) &&
+          ((separatorChild &&
+            React.cloneElement(separatorChild, {
+              style: {
+                width: icon.current?.offsetWidth
+              }
+            } as unknown as React.HTMLAttributes<HTMLDivElement>)) || (
+            <TimelineSeparator
+              style={{
+                width: icon.current?.offsetWidth
+              }}
+            />
+          ))}
         <div
           className={cn(
             "flex-1 pb-2",
@@ -276,13 +301,19 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
         {(position === "right" ||
           position === "default-reverse" ||
           (position === "alternate" && isEvenIndex) ||
-          (position === "alternate-reverse" && isOddIndex)) && (
-          <TimelineSeparator
-            style={{
-              width: icon.current?.offsetWidth
-            }}
-          />
-        )}
+          (position === "alternate-reverse" && isOddIndex)) &&
+          ((separatorChild &&
+            React.cloneElement(separatorChild, {
+              style: {
+                width: icon.current?.offsetWidth
+              }
+            } as unknown as React.HTMLAttributes<HTMLDivElement>)) || (
+            <TimelineSeparator
+              style={{
+                width: icon.current?.offsetWidth
+              }}
+            />
+          ))}
         {(position === "default-reverse" ||
           (position === "alternate" && isEvenIndex) ||
           (position === "alternate-reverse" && isOddIndex)) && (
