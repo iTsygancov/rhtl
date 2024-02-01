@@ -56,15 +56,8 @@ const TimelineItem = React.forwardRef<HTMLDivElement, TimelineItemProps>(
       refs: { icon },
       isRefsInitialized,
       setIsRefInitialized,
-      position,
-      setIndex
+      position
     } = useTimelineContext();
-
-    React.useEffect(() => {
-      if (orderIndex) {
-        setIndex(orderIndex);
-      }
-    }, [setIndex, orderIndex]);
 
     React.useEffect(() => {
       if (!isRefsInitialized && icon.current) {
@@ -116,14 +109,18 @@ const TimelineIcon = ({
     </div>
   ) : (
     <div
+      className='flex items-center justify-center'
       ref={icon}
       style={{
         width: icon.current?.offsetWidth,
         height: icon.current?.offsetHeight
       }}
-      className={cn("size-3 rounded-full bg-slate-900", className)}
-      {...props}
-    />
+    >
+      <div
+        className={cn("size-3 rounded-full bg-slate-900", className)}
+        {...props}
+      />
+    </div>
   );
 };
 TimelineIcon.displayName = "TimelineIcon";

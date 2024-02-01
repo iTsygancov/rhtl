@@ -16,8 +16,6 @@ type TimelineContextProps = {
   setIsRefInitialized: React.Dispatch<React.SetStateAction<boolean>>;
   position: Position;
   setPosition: React.Dispatch<React.SetStateAction<Position>>;
-  index: number;
-  setIndex: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export const TimelineContext = createContext<TimelineContextProps | undefined>(
@@ -37,12 +35,15 @@ export function TimelineContextProvider({
   const [position, setPosition] = useState<Position>(
     initialPosition || "default"
   );
-  const [index, setIndex] = useState(0);
   const iconRef = useRef<HTMLDivElement | null>(null);
+
+  console.log();
 
   useEffect(() => {
     if (initialPosition) {
       setPosition(initialPosition);
+    } else {
+      setPosition("default");
     }
   }, [initialPosition]);
 
@@ -55,9 +56,7 @@ export function TimelineContextProvider({
           icon: iconRef
         },
         position,
-        setPosition,
-        index,
-        setIndex
+        setPosition
       }}
     >
       {children}

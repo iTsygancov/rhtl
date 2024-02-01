@@ -9,7 +9,7 @@ import {
 function App() {
   return (
     <div className='container mx-auto'>
-      <Timeline position='alternate-reverse'>
+      <Timeline>
         <TimelineItem>
           <TimelineHeader>
             <TimelineTitle>February 2022</TimelineTitle>
