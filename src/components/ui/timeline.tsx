@@ -106,6 +106,7 @@ const TimelineIcon = React.forwardRef<
       ref={ref}
       style={{
         width: iconRef.current?.offsetWidth
+        // height: iconRef.current?.offsetHeight
       }}
     >
       <div
@@ -164,7 +165,7 @@ const TimelineHeader = React.forwardRef<HTMLDivElement, TimelineHeaderProps>(
           React.cloneElement(iconChild, {
             ref: iconRef
           } as unknown as React.HTMLAttributes<HTMLDivElement>)) || (
-          <TimelineIcon />
+          <TimelineIcon ref={iconRef} />
         )
       );
     };
