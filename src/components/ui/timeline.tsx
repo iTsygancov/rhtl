@@ -53,6 +53,11 @@ const TimelineItem = React.forwardRef<HTMLDivElement, TimelineItemProps>(
   ({ className, orderIndex, children, ...props }, ref) => {
     const { iconRef, isRefsInitialized, setIsRefInitialized, position } =
       useTimelineContext();
+    const isContentCentered =
+      position === "default" ||
+      position === "default-reverse" ||
+      position === "alternate" ||
+      position === "alternate-reverse";
 
     React.useEffect(() => {
       if (!isRefsInitialized && iconRef.current) {
@@ -66,11 +71,7 @@ const TimelineItem = React.forwardRef<HTMLDivElement, TimelineItemProps>(
           "relative flex min-h-16 flex-col gap-2",
           !isRefsInitialized && "opacity-0",
           position === "right" && "items-end",
-          (position === "default" ||
-            position === "default-reverse" ||
-            position === "alternate" ||
-            position === "alternate-reverse") &&
-            "items-center",
+          isContentCentered && "items-center",
           className
         )}
         ref={ref}
