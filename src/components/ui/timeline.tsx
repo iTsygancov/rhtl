@@ -35,7 +35,7 @@ const Timeline = React.forwardRef<HTMLDivElement, TimelineProps>(
           if (React.isValidElement(child)) {
             return React.cloneElement(child, {
               orderIndex: index + 1
-            } as unknown as React.HTMLAttributes<HTMLDivElement>);
+            } as React.HTMLAttributes<HTMLElement>);
           }
         })}
       </div>
@@ -45,8 +45,7 @@ const Timeline = React.forwardRef<HTMLDivElement, TimelineProps>(
 Timeline.displayName = "Timeline";
 
 export interface TimelineItemProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof timelineVariants> {
+  extends React.HTMLAttributes<HTMLDivElement> {
   orderIndex?: number;
 }
 
@@ -81,7 +80,7 @@ const TimelineItem = React.forwardRef<HTMLDivElement, TimelineItemProps>(
           if (React.isValidElement(child)) {
             return React.cloneElement(child, {
               orderindex: orderIndex
-            } as unknown as TimelineHeaderProps);
+            } as TimelineHeaderProps);
           }
         })}
       </div>
@@ -106,7 +105,6 @@ const TimelineIcon = React.forwardRef<
       ref={ref}
       style={{
         width: iconRef.current?.offsetWidth
-        // height: iconRef.current?.offsetHeight
       }}
     >
       <div
@@ -133,8 +131,7 @@ const TimelineSeparator = React.forwardRef<
 TimelineSeparator.displayName = "TimelineSeparator";
 
 export interface TimelineHeaderProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof timelineVariants> {
+  extends React.HTMLAttributes<HTMLDivElement> {
   orderindex?: number;
 }
 
@@ -143,30 +140,61 @@ const TimelineHeader = React.forwardRef<HTMLDivElement, TimelineHeaderProps>(
     const { position, iconRef } = useTimelineContext();
     const isEvenIndex = orderindex && orderindex % 2 === 0;
     const isOddIndex = orderindex && orderindex % 2 !== 0;
+    const shouldRenderLeftEmptyDiv =
+      position === "default" ||
+      (position === "alternate" && isOddIndex) ||
+      (position === "alternate-reverse" && isEvenIndex);
+    const shouldRenderLeftIcon =
+      position === "left" ||
+      position === "default" ||
+      (position === "alternate" && isOddIndex) ||
+      (position === "alternate-reverse" && isEvenIndex);
+    const shouldRenderRightIcon =
+      position === "right" ||
+      position === "default-reverse" ||
+      (position === "alternate" && isEvenIndex) ||
+      (position === "alternate-reverse" && isOddIndex);
+    const shouldRenderRightEmptyDiv =
+      position === "default-reverse" ||
+      (position === "alternate" && isEvenIndex) ||
+      (position === "alternate-reverse" && isOddIndex);
+    const isTextRightAligned =
+      (position === "alternate" && isEvenIndex) ||
+      (position === "alternate-reverse" && isOddIndex);
 
-    const iconChild = React.Children.toArray(children).find(
-      (child) => React.isValidElement(child) && child.type === TimelineIcon
-    ) as
-      | React.ReactElement<
-          unknown,
-          string | React.JSXElementConstructor<unknown>
-        >
-      | undefined;
+    const renderFilteredChild = () => {
+      const filteredChild = React.Children.toArray(children).filter((child) => {
+        if (React.isValidElement(child) && child.type !== TimelineIcon) {
+          return child.props.children;
+        }
+      });
 
-    const filteredChild = React.Children.toArray(children).filter((child) => {
-      if (React.isValidElement(child) && child.type !== TimelineIcon) {
-        return child.props.children;
-      }
-    });
+      return React.Children.toArray(filteredChild).map((child, index) => {
+        return (
+          React.isValidElement(child) &&
+          React.cloneElement(child, {
+            className: cn(isTextRightAligned && "text-right"),
+            key: index
+          } as React.HTMLAttributes<HTMLElement>)
+        );
+      });
+    };
 
     const renderIcon = () => {
+      const iconChild = React.Children.toArray(children).find(
+        (child) => React.isValidElement(child) && child.type === TimelineIcon
+      ) as
+        | React.ReactElement<
+            unknown,
+            string | React.JSXElementConstructor<unknown>
+          >
+        | undefined;
+
       return (
         (iconChild &&
           React.cloneElement(iconChild, {
             ref: iconRef
-          } as unknown as React.HTMLAttributes<HTMLDivElement>)) || (
-          <TimelineIcon ref={iconRef} />
-        )
+          } as React.HTMLAttributes<HTMLDivElement>)) || <TimelineIcon />
       );
     };
 
@@ -179,38 +207,11 @@ const TimelineHeader = React.forwardRef<HTMLDivElement, TimelineHeaderProps>(
         )}
         {...props}
       >
-        {(position === "default" ||
-          (position === "alternate" && isOddIndex) ||
-          (position === "alternate-reverse" && isEvenIndex)) && (
-          <div className='flex-1'></div>
-        )}
-        {(position === "left" ||
-          position === "default" ||
-          (position === "alternate" && isOddIndex) ||
-          (position === "alternate-reverse" && isEvenIndex)) &&
-          renderIcon()}
-        {React.Children.toArray(filteredChild).map((child, index) => {
-          return (
-            React.isValidElement(child) &&
-            React.cloneElement(child, {
-              className: cn(
-                position === "alternate" && isEvenIndex && "text-right",
-                position === "alternate-reverse" && isOddIndex && "text-right"
-              ),
-              key: index
-            } as React.HTMLAttributes<HTMLElement>)
-          );
-        })}
-        {(position === "right" ||
-          position === "default-reverse" ||
-          (position === "alternate" && isEvenIndex) ||
-          (position === "alternate-reverse" && isOddIndex)) &&
-          renderIcon()}
-        {(position === "default-reverse" ||
-          (position === "alternate" && isEvenIndex) ||
-          (position === "alternate-reverse" && isOddIndex)) && (
-          <div className='flex-1'></div>
-        )}
+        {shouldRenderLeftEmptyDiv && <div className='flex-1'></div>}
+        {shouldRenderLeftIcon && renderIcon()}
+        {renderFilteredChild()}
+        {shouldRenderRightIcon && renderIcon()}
+        {shouldRenderRightEmptyDiv && <div className='flex-1'></div>}
       </div>
     );
   }
@@ -245,24 +246,46 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
     const { iconRef, position } = useTimelineContext();
     const isOddIndex = orderindex && orderindex % 2 === 1;
     const isEvenIndex = orderindex && orderindex % 2 === 0;
-
-    const separatorChild = React.Children.toArray(children).find(
-      (child) => React.isValidElement(child) && child.type === TimelineSeparator
-    ) as
-      | React.ReactElement<
-          unknown,
-          string | React.JSXElementConstructor<unknown>
-        >
-      | undefined;
+    const shouldRenderLeftEmptyDiv =
+      position === "default" ||
+      (position === "alternate" && isOddIndex) ||
+      (position === "alternate-reverse" && isEvenIndex);
+    const shouldRenderLeftSeparator =
+      position === "left" ||
+      position === "default" ||
+      (position === "alternate" && isOddIndex) ||
+      (position === "alternate-reverse" && isEvenIndex);
+    const shouldRenderRightSeparator =
+      position === "right" ||
+      position === "default-reverse" ||
+      (position === "alternate" && isEvenIndex) ||
+      (position === "alternate-reverse" && isOddIndex);
+    const shouldRenderRightEmptyDiv =
+      position === "default-reverse" ||
+      (position === "alternate" && isEvenIndex) ||
+      (position === "alternate-reverse" && isOddIndex);
+    const isTextRightAligned =
+      (position === "alternate" && isEvenIndex) ||
+      (position === "alternate-reverse" && isOddIndex);
 
     const renderSeparator = () => {
+      const separatorChild = React.Children.toArray(children).find(
+        (child) =>
+          React.isValidElement(child) && child.type === TimelineSeparator
+      ) as
+        | React.ReactElement<
+            unknown,
+            string | React.JSXElementConstructor<unknown>
+          >
+        | undefined;
+
       return (
         (separatorChild &&
           React.cloneElement(separatorChild, {
             style: {
               width: iconRef.current?.offsetWidth
             }
-          } as unknown as React.HTMLAttributes<HTMLDivElement>)) || (
+          } as React.HTMLAttributes<HTMLDivElement>)) || (
           <TimelineSeparator
             style={{
               width: iconRef.current?.offsetWidth
@@ -278,35 +301,13 @@ const TimelineContent = React.forwardRef<HTMLDivElement, TimelineContentProps>(
         className={cn("flex w-full justify-center gap-2", className)}
         {...props}
       >
-        {(position === "default" ||
-          (position === "alternate" && isOddIndex) ||
-          (position === "alternate-reverse" && isEvenIndex)) && (
-          <div className='flex-1'></div>
-        )}
-        {(position === "left" ||
-          position === "default" ||
-          (position === "alternate" && isOddIndex) ||
-          (position === "alternate-reverse" && isEvenIndex)) &&
-          renderSeparator()}
-        <div
-          className={cn(
-            "flex-1 pb-2",
-            position === "alternate" && isEvenIndex && "text-right",
-            position === "alternate-reverse" && isOddIndex && "text-right"
-          )}
-        >
+        {shouldRenderLeftEmptyDiv && <div className='flex-1'></div>}
+        {shouldRenderLeftSeparator && renderSeparator()}
+        <div className={cn("flex-1 pb-2", isTextRightAligned && "text-right")}>
           {children}
         </div>
-        {(position === "right" ||
-          position === "default-reverse" ||
-          (position === "alternate" && isEvenIndex) ||
-          (position === "alternate-reverse" && isOddIndex)) &&
-          renderSeparator()}
-        {(position === "default-reverse" ||
-          (position === "alternate" && isEvenIndex) ||
-          (position === "alternate-reverse" && isOddIndex)) && (
-          <div className='flex-1'></div>
-        )}
+        {shouldRenderRightSeparator && renderSeparator()}
+        {shouldRenderRightEmptyDiv && <div className='flex-1'></div>}
       </div>
     );
   }
