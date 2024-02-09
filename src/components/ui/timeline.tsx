@@ -118,14 +118,12 @@ TimelineIcon.displayName = "TimelineIcon";
 
 const TimelineSeparator = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, children, ...props }, ref) => {
+  Omit<React.HTMLAttributes<HTMLDivElement>, "children">
+>(({ className, ...props }, ref) => {
   return (
-    children || (
-      <div ref={ref} className='flex gap-2' {...props}>
-        <div className={cn("mx-auto w-0.5 bg-slate-200", className)}></div>
-      </div>
-    )
+    <div ref={ref} className='flex gap-2' {...props}>
+      <div className={cn("mx-auto w-0.5 bg-slate-200", className)} />
+    </div>
   );
 });
 TimelineSeparator.displayName = "TimelineSeparator";
