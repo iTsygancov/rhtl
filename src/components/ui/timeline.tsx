@@ -69,7 +69,6 @@ const TimelineItem = React.forwardRef<HTMLDivElement, TimelineItemProps>(
       <div
         className={cn(
           "relative flex min-h-16 flex-col gap-2",
-          !isRefsInitialized && "opacity-0",
           position === "right" && "items-end",
           isContentCentered && "items-center",
           className
@@ -191,12 +190,17 @@ const TimelineHeader = React.forwardRef<HTMLDivElement, TimelineHeaderProps>(
           >
         | undefined;
 
-      return (
-        (iconChild &&
-          React.cloneElement(iconChild, {
-            ref: iconRef
-          } as React.HTMLAttributes<HTMLDivElement>)) || <TimelineIcon />
-      );
+      if (iconChild) {
+        return React.cloneElement(iconChild, {
+          ref: iconRef
+        } as React.HTMLAttributes<HTMLDivElement>);
+      }
+
+      if (orderindex === 1) {
+        return <TimelineIcon ref={iconRef} />;
+      }
+
+      return <TimelineIcon />;
     };
 
     return (
