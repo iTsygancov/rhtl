@@ -1,19 +1,11 @@
 import { Position } from "@/types";
-import {
-  ReactNode,
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from "react";
+import { ReactNode, createContext, useContext, useRef, useState } from "react";
 
 type TimelineContextProps = {
   isRefsInitialized: boolean;
   iconRef: React.RefObject<HTMLDivElement>;
   setIsRefInitialized: React.Dispatch<React.SetStateAction<boolean>>;
   position: Position;
-  setPosition: React.Dispatch<React.SetStateAction<Position>>;
 };
 
 export const TimelineContext = createContext<TimelineContextProps | undefined>(
@@ -27,21 +19,10 @@ type TimelineContextProviderProps = {
 
 export function TimelineContextProvider({
   children,
-  initialPosition
+  initialPosition = "default"
 }: TimelineContextProviderProps) {
   const [isRefsInitialized, setIsRefInitialized] = useState(false);
-  const [position, setPosition] = useState<Position>(
-    initialPosition || "default"
-  );
   const iconRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (initialPosition) {
-      setPosition(initialPosition);
-    } else {
-      setPosition("default");
-    }
-  }, [initialPosition]);
 
   return (
     <TimelineContext.Provider
@@ -49,8 +30,7 @@ export function TimelineContextProvider({
         isRefsInitialized,
         setIsRefInitialized,
         iconRef,
-        position,
-        setPosition
+        position: initialPosition
       }}
     >
       {children}
